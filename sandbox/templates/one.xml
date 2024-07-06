@@ -45,7 +45,7 @@
   </default>
 
   <worldbody>
-    <body name="robot" pos="{{ robot.pos }}">
+    <body name="robot" pos="{{ robot.pos }}" quat="{{ robot.quat }}">
       <freejoint/>
 
       <!-- body is just a box, wheels below -->

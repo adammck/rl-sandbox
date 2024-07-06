@@ -21,7 +21,8 @@ def keypress(code: int):
 while True:
    
     aren = arena.Arena()
-    m, d = aren.get()
+    m = aren.model
+    d = aren.data
     ctrl = controllers.Cheater(aren.camera().id, aren.target().id)
 
     with mujoco.viewer.launch_passive(m, d, key_callback=keypress) as viewer:

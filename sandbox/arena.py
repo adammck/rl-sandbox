@@ -9,13 +9,48 @@ import mujoco
 import numpy as np
 from jinja2 import Environment, PackageLoader, select_autoescape
 
+
 class Arena:
     def __init__(self, num_obstacles=5):
+        self._num_obstacles = num_obstacles
+
         env = Environment(
             loader=PackageLoader("sandbox.arena", "templates"),
             autoescape=select_autoescape())
-        self._tmpl = env.get_template("one.xml")
-        self._num_obstacles = num_obstacles
+        tmpl = env.get_template("one.xml")
+        xml = tmpl.render(**self._vars())
+
+        self._model = mujoco.MjModel.from_xml_string(xml)
+        self._data = mujoco.MjData(self._model)
+
+    @property
+    def model(self) -> mujoco.MjModel:
+        return self._model
+
+    @property
+    def data(self) -> mujoco.MjData:
+        return self._data
+
+    def render(self, cam_name=None) -> np.array:
+
+        if cam_name is None:
+            cam_name = self.camera().name
+
+        opt = mujoco.MjvOption()
+        ren = mujoco.Renderer(self._model, width=512, height=512)
+        ren.update_scene(self._data, camera=cam_name, scene_option=opt)
+        pixels = ren.render()
+
+        # render a crosshair if it's visible
+        #   px, py = get_pxpy(mjmodel, mjdata, ren)
+        #   if 0 <= px < ren.width and 0 <= py < ren.height:
+        #     pixels = add_crosshair(pixels, px, py)
+
+        return pixels
+
+    def target_visible(self):
+        """Returns true if the target is currently visible to the robot."""
+        pass
 
     def xsize(self):
         return 18
@@ -32,7 +67,7 @@ class Arena:
     def target(self):
        return self._model.body("target_red")
 
-    def vars(self):
+    def _vars(self):
         return {
             "robot": Robot(self),
             "target": Target(self),
@@ -41,15 +76,6 @@ class Arena:
                 for n in range(self._num_obstacles)
             ]
         }
-
-    def get(self) -> Tuple[mujoco.MjModel, mujoco.MjData]:
-        xml = self._tmpl.render(**self.vars())
-        with tempfile.NamedTemporaryFile() as tmp:
-            tmp.write(xml.encode())
-            self._model = mujoco.MjModel.from_xml_path(tmp.name)
-            self._data = mujoco.MjData(self._model)
-
-        return self._model, self._data
 
 # TODO: these are all rather duplicative. use a superclass or something.
 
@@ -60,9 +86,16 @@ class Robot():
         self._x = random.uniform(-x, x)
         self._y = random.uniform(-y, y)
 
+        # orientation (only z axis)
+        self._yaw = np.radians(random.randint(0, 360))
+
     @property
     def pos(self):
         return f"{self._x} {self._y} 0"
+
+    @property
+    def quat(self):
+        return f"{np.cos(self._yaw/2):0.2f} 0 0 {np.sin(self._yaw/2):0.2f}"
 
 class Target():
     def __init__(self, arena):
