@@ -26,6 +26,13 @@ while True:
     ctrl = controllers.Cheater(aren.camera().id, aren.target().id)
 
     with mujoco.viewer.launch_passive(m, d, key_callback=keypress) as viewer:
+
+        # set the view to the default camera for this arena, so we see what the
+        # robot sees.
+        with viewer.lock():
+            viewer.cam.type = mujoco.mjtCamera.mjCAMERA_FIXED
+            viewer.cam.fixedcamid = aren.camera().id
+
         while viewer.is_running():
             start = time.time()
             mujoco.mj_step(m, d)
