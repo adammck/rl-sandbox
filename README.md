@@ -12,7 +12,7 @@ towards it.
 ```console
 $ git clone https://github.com/adammck/rl-sandbox.git
 $ pyenv install
-$ pip install .
+$ pip install -e .
 ```
 
 ## Usage
