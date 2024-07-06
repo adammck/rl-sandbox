@@ -116,14 +116,9 @@ class Obstacle():
     def size(self):
         return f"{self._xysize:0.2f} {self._xysize:0.2f} {self._zsize:0.2f}"
 
-    def _round_up(self, n, decimals=0):
-        multiplier = 10 ** decimals
-        return math.ceil(n * multiplier) / multiplier
-
     @property
-    def zsize2(self):
-        z = self._round_up(self._zsize/2, 2)
-        return str(z)
+    def zsize(self):
+        return f"{self._zsize:0.2f}"
 
     @property
     def rgba(self):

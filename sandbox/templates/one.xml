@@ -120,7 +120,7 @@
     {% for obs in obstacles %}
     <body name="target_{{ obs.name }}" pos="{{ obs.pos }}" quat="{{ obs.quat }}">
       <freejoint/>
-      <geom type="box" size="{{ obs.size }}" pos="0 0 {{ obs.zsize2 }}" rgba="{{ obs.rgba }}" />
+      <geom type="box" size="{{ obs.size }}" pos="0 0 {{ obs.zsize }}" rgba="{{ obs.rgba }}" />
     </body>
     {% endfor %}
 
