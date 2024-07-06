@@ -3,8 +3,7 @@
 import time
 import mujoco
 import mujoco.viewer
-import arena
-import controllers
+from sandbox import arena, controllers
 
 # signals
 reset = False

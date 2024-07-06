@@ -12,7 +12,7 @@ from jinja2 import Environment, PackageLoader, select_autoescape
 class Arena:
     def __init__(self, num_obstacles=5):
         env = Environment(
-            loader=PackageLoader("arena", "templates"),
+            loader=PackageLoader("sandbox.arena", "templates"),
             autoescape=select_autoescape())
         self._tmpl = env.get_template("one.xml")
         self._num_obstacles = num_obstacles

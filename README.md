@@ -18,6 +18,5 @@ $ pip install -e .
 ## Usage
 
 ```console
-$ cd sandbox
-$ mjpython main.py
+$ mjpython ./sandbox/cmd/viewer/main.py
 ```
