@@ -40,7 +40,8 @@ while True:
 
             # otherwise, apply the next action.
             # TODO: for the actual model, this should take pixels, not the actual data!
-            ctrl.act(d)
+            with viewer.lock():
+                ctrl.act(d)
 
             # wait until its time to advance.
             # this is pasted from the examples and is NOT accurate.
