@@ -10,7 +10,7 @@ import numpy as np
 class Arena:
     def __init__(self, fn):
        # TODO: generate the XML from the positions rather than shuffling.
-       path = os.path.abspath(f"../arenas/{fn}")
+       path = os.path.abspath(f"arenas/{fn}")
        self._model = mujoco.MjModel.from_xml_path(path)
        self._data = mujoco.MjData(self._model)
 
