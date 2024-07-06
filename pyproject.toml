@@ -1,0 +1,8 @@
+[project]
+name = "rl-sandbox"
+version = "0.1"
+
+dependencies = [
+  "mujoco>=3.1.6",
+  "numpy>=2.0.0"
+]

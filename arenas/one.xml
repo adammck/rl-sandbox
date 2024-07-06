@@ -1,0 +1,156 @@
+<mujoco>
+  <!-- the default, euler, seems to be unstable. sometimes the thing does
+  backflips when waving the arm around. -->
+  <option integrator="implicit" />
+
+  <visual>
+    <!-- increase size of framebuffer for rendering -->
+    <global offwidth="1024" offheight="1024" />
+
+    <!-- enable headlight, but make it pretty dull -->
+    <!-- see: https://learnopengl.com/Lighting/Basic-Lighting -->
+    <!-- see: https://mujoco.readthedocs.io/en/2.3.2/XMLreference.html#visual-headlight -->
+    <headlight active="1" ambient="0 0 0" diffuse="0.2 0.2 0.2" specular="0.5 0.5 0.5" />
+
+    <!-- hack: reduce the znear (default=0.01) to avoid clipping when camera is very close to targets -->
+    <!-- see: https://mujoco.readthedocs.io/en/stable/XMLreference.html#visual-map-znear -->
+    <map znear="0.002" zfar="60" />
+  </visual>
+
+  <!-- <asset>
+    <texture name="grid" type="2d" builtin="checker" width="512" height="512" rgb1=".1 .2 .3" rgb2=".2 .3 .4" />
+    <material name="grid" texture="grid" texrepeat="4 4" texuniform="true" reflectance="0" />
+  </asset> -->
+
+  <asset>
+    <!--<texture name="floor" type="2d" file="WoodFloor048_1K-PNG_Color.png" width="1024" height="1024" />
+    <material name="floor" texture="floor" texrepeat="1 1" texuniform="true" />-->
+
+    <texture name="grid" type="2d" builtin="checker" width="512" height="512" rgb1=".1 .2 .3" rgb2=".2 .3 .4" />
+    <material name="floor" texture="grid" texrepeat="4 4" texuniform="true" reflectance="0" />
+  </asset>
+  <asset>
+    <!--<texture name="wall" type="cube" file="PaintedPlaster017_1K-PNG_Color.png" width="512" height="512" />
+    <material name="wall" texture="wall" />-->
+    <material name="wall" rgba="0 0 0 1" reflectance="0" />
+  </asset>
+
+  <default>
+    <geom mass="1" rgba="0.8 0.8 0.8 1" />
+    <joint damping=".05" />
+
+    <default class="wheel">
+      <geom type="cylinder" size="0.06 0.02" rgba="0.2 0.2 0.2 1" />
+    </default>
+  </default>
+
+  <worldbody>
+    <body name="robot" pos="0 0 0">
+      <freejoint/>
+
+      <!-- body is just a box, wheels below -->
+      <body name="chassis" pos="0 0 0.12">
+        <geom name="main" type="box" size="0.3 0.3 0.2" pos="0 0 0.21" mass="0" />
+        <geom name="wheels_conn" type="box" size="0.2 0.03 0.02" pos="0 0.2 -0.01" />
+        <geom name="wheels_axel" type="box" size="0.23 0.03 0.03" pos="0 0.2 -0.06" />
+        <geom name="caster_conn" type="box" size="0.04 0.04 0.04" pos="0 -0.24 -0.03" />
+
+        <geom name="bumper" type="box" size="0.3 0.025 0.05" pos="0 0.325 0.06" rgba="0.3 0.3 0.3 1" />
+
+        <!-- front camera pointed 15 deg towards the ground -->
+        <body pos="0 0.3 0.39">
+          <body pos="0 0 -0.08" euler="-15 0 0">
+            <geom type="box" size="0.08 0.02 0.04" pos="0 -0.02 0.04" rgba="0.2 0.2 0.2 1" />
+            <camera name="pov" mode="fixed" zaxis="0 -1 0" pos="0 -0.04 0.04" />
+          </body>
+        </body>
+
+        <!-- just a turntable for now -->
+        <body name="arm" pos="0 0 0.41">
+          <joint name="shoulder_z" />
+          <geom type="cylinder" size="0.2 0.01" pos="0 0 0.01" rgba="0.6 0.6 0.6 1" />
+          <geom type="box" size="0.01 0.18 0.002" pos="0 0 0.022" rgba="0.4 0.4 0.4 1" />
+        </body>
+      </body>
+
+      <!-- left wheel, origin at center of wheel diameter 0.06 -->
+      <body name="lwheel" pos="-0.24 0.2 0.06" zaxis="-1 0 0">
+        <joint name="jl" damping=".05" />
+        <geom class="wheel" pos="0 0 0.02" />
+        <geom type="box" size="0.04 0.01 0.001" pos="0 0 0.041" rgba="0 1 0 1" />
+      </body>
+
+      <!-- right wheel -->
+      <body name="rwheel" pos="0.24 0.2 0.06" zaxis="1 0 0">
+        <joint name="jr" damping=".05" />
+        <geom class="wheel" pos="0 0 0.02" />
+        <geom type="box" size="0.04 0.01 0.001" pos="0 0 0.041" rgba="1 0 0 1" />
+      </body>
+
+      <!-- rear caster, no friction on ground -->
+      <body name="caster" pos="0 -0.24 0">
+        <geom type="sphere" size="0.03" pos="0 0 0.03" condim="1" priority="1" rgba="0.2 0.2 0.2 1" />
+        <geom type="cylinder" size="0.03 0.01" pos="0 0 0.04" />
+      </body>
+
+    </body>
+
+    <!-- floor -->
+    <geom type="plane" size="10 10 .01" material="floor" />
+
+    <!-- walls -->
+    <geom name="wall_left"  type="box" size="0.1 10 1.6" pos="-10.1 0 1.6" material="wall" />
+    <geom name="wall_right" type="box" size="0.1 10 1.6" pos="10.1 0 1.6" material="wall" />
+    <geom name="wall_front" type="box" size="10.2 0.1 1.6" pos="0 10.1 1.6" material="wall" />
+    <geom name="wall_back"  type="box" size="10.2 0.1 1.6" pos="0 -10.1 1.6" material="wall" />
+
+    <!-- couple of random lights -->
+    <light pos="-4 4 12" dir="0 0 -1" attenuation="0.25 0 0" />
+    <light pos="4 -4 9" dir="0 0 -1" attenuation="0.25 0 0" />
+
+    <!-- targets -->
+    <!-- TODO: replace condim=1 with friction -->
+    <body name="target_red" pos="-7 5 0">
+      <freejoint/>
+      <light pos="0 0 2" dir="0 0 -1" />
+      <geom type="box" size="0.2 0.2 0.2" pos="0 0 0.2" rgba="1 0.2 0.2 1" condim="1" />
+    </body>
+    <body name="target_green" pos="6 3 0">
+      <freejoint/>
+      <light pos="0 0 2" dir="0 0 -1" />
+      <geom type="box" size="0.1 0.1 0.1" pos="0 0 0.1" rgba="0.2 1 0.2 1" />
+    </body>
+    <body name="target_blue" pos="-1 -8 0">
+      <freejoint/>
+      <light pos="0 0 2" dir="0 0 -1" />
+      <geom type="box" size="0.3 0.3 0.3" pos="0 0 0.3" rgba="0.2 0.2 1 1" />
+    </body>
+
+    <!-- yellow target is right in front of robot
+    <body name="target_yellow" pos="0 2 0">
+      <freejoint/>
+      <light pos="0 0 2" dir="0 0 -1" />
+      <geom type="box" size="0.2 0.2 0.2" pos="0 0 0.2" rgba="1 1 0.2 1" condim="1" />
+    </body> -->
+
+    <!-- above origin, high enough to see the entire arena -->
+    <camera name="overview" pos="0 0 26" />
+  </worldbody>
+
+  <tendon>
+    <fixed name="forward">
+      <joint joint="jl" coef=".5"/>
+      <joint joint="jr" coef="-.5"/>
+    </fixed>
+    <fixed name="turn">
+      <joint joint="jl" coef=".5"/>
+      <joint joint="jr" coef=".5"/>
+    </fixed>
+  </tendon>
+
+  <actuator>
+    <motor name="forward" tendon="forward" ctrlrange="-1 1"/>
+    <motor name="turn" tendon="turn" ctrlrange="-1 1"/>
+    <position name="sz" joint="shoulder_z" ctrlrange="-1.57 1.57" kp="50" kv="5" />
+  </actuator>
+</mujoco>
