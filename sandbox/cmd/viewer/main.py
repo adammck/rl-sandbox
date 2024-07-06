@@ -10,8 +10,8 @@ reset = False
 exit = False
 
 def keypress(code: int):
+    #print(f"keypress: code={code}")
     global reset, exit
-    print(f"keypress: code={code}")
 
     if code == 69: # e: exit
         exit = True

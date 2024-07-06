@@ -44,7 +44,6 @@ class Arena:
 
     def get(self) -> Tuple[mujoco.MjModel, mujoco.MjData]:
         xml = self._tmpl.render(**self.vars())
-        print(xml)
         with tempfile.NamedTemporaryFile() as tmp:
             tmp.write(xml.encode())
             self._model = mujoco.MjModel.from_xml_path(tmp.name)
