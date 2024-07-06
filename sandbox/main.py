@@ -6,7 +6,7 @@ import mujoco.viewer
 import arena
 import controllers
 
-a = arena.Arena("one.xml")
+a = arena.Arena()
 m, d = a.get()
 
 ctrl = controllers.Cheater(a.camera().id, a.target().id)

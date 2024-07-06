@@ -45,7 +45,7 @@
   </default>
 
   <worldbody>
-    <body name="robot" pos="0 0 0">
+    <body name="robot" pos="{{ robot.pos }}">
       <freejoint/>
 
       <!-- body is just a box, wheels below -->
@@ -108,30 +108,21 @@
     <light pos="-4 4 12" dir="0 0 -1" attenuation="0.25 0 0" />
     <light pos="4 -4 9" dir="0 0 -1" attenuation="0.25 0 0" />
 
-    <!-- targets -->
+    <!-- target -->
     <!-- TODO: replace condim=1 with friction -->
-    <body name="target_red" pos="-7 5 0">
+    <body name="target_red" pos="{{ target.pos }}">
       <freejoint/>
       <light pos="0 0 2" dir="0 0 -1" />
       <geom type="box" size="0.2 0.2 0.2" pos="0 0 0.2" rgba="1 0.2 0.2 1" condim="1" />
     </body>
-    <body name="target_green" pos="6 3 0">
-      <freejoint/>
-      <light pos="0 0 2" dir="0 0 -1" />
-      <geom type="box" size="0.1 0.1 0.1" pos="0 0 0.1" rgba="0.2 1 0.2 1" />
-    </body>
-    <body name="target_blue" pos="-1 -8 0">
-      <freejoint/>
-      <light pos="0 0 2" dir="0 0 -1" />
-      <geom type="box" size="0.3 0.3 0.3" pos="0 0 0.3" rgba="0.2 0.2 1 1" />
-    </body>
 
-    <!-- yellow target is right in front of robot
-    <body name="target_yellow" pos="0 2 0">
+    <!-- obstacles -->
+    {% for obs in obstacles %}
+    <body name="target_{{ obs.name }}" pos="{{ obs.pos }}" quat="{{ obs.quat }}">
       <freejoint/>
-      <light pos="0 0 2" dir="0 0 -1" />
-      <geom type="box" size="0.2 0.2 0.2" pos="0 0 0.2" rgba="1 1 0.2 1" condim="1" />
-    </body> -->
+      <geom type="box" size="{{ obs.size }}" pos="0 0 {{ obs.zsize2 }}" rgba="{{ obs.rgba }}" />
+    </body>
+    {% endfor %}
 
     <!-- above origin, high enough to see the entire arena -->
     <camera name="overview" pos="0 0 26" />
