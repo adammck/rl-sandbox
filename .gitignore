@@ -5,3 +5,6 @@
 # don't check in generated training data.
 /data/img/*
 /data/tfds/*
+
+# ignore tensorboard logs
+/logs/*
