@@ -37,7 +37,7 @@ class TheDataset:
 
             # if the target is out of view, skip this iteration.
             # TODO: move this check into pixel_position.
-            if x < 0 or x > 512 or y < 0 or y > 512:
+            if x < 0 or x >= 512 or y < 0 or y >= 512:
                 skipped += 1
                 continue
 
