@@ -10,6 +10,11 @@ val_size = int(len(ds) * 0.2)
 ds_training = ds.skip(val_size)
 ds_validate = ds.take(val_size)
 
+
+batch_size = 4
+ds_training = ds_training.cache().shuffle(buffer_size=100).batch(batch_size).prefetch(buffer_size=tf.data.AUTOTUNE)
+ds_validate = ds_validate.cache().batch(batch_size).prefetch(buffer_size=tf.data.AUTOTUNE)
+
 model = tf.keras.Sequential([
     tf.keras.layers.InputLayer(shape=(512, 512, 3)),
 

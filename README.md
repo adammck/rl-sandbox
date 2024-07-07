@@ -17,6 +17,14 @@ $ pip install -e .
 
 ## Usage
 
+Generate some training data:
+
 ```console
-$ mjpython ./sandbox/cmd/viewer/main.py
+$ mjpython ./sandbox/cmd/gendata/main.py
+```
+
+The train the model:
+
+```console
+$ python ./sandbox/cmd/train/main.py
 ```

@@ -1,15 +1,15 @@
 #!/usr/bin/env python
 
 import numpy as np
-from typing import List
+from typing import List, Tuple
 
-def onehot_to_int(arr: List[int]):
-    for i, cell in enumerate(arr):
-        if cell == 1:
-            return i
-    raise ValueError("invalid array")
+def onehot_to_pos(arr: List[int]) -> Tuple[int, int]:
+    index = np.argmax(arr)
+    y = (index // 8)
+    x = (index % 8)
+    return x, y
 
-def position_to_onehot(x: int, y: int):
+def pos_to_onehot(x: int, y: int):
     arr = np.zeros(64)
     arr[(int(y/64)*8) + int(x/64)] = 1
     return arr

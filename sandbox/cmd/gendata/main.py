@@ -42,12 +42,13 @@ class TheDataset:
                 continue
 
             pixels = aren.render()
-            tfpixels = tf.expand_dims(pixels, axis=0)
+            #tfpixels = tf.expand_dims(pixels, axis=0)
 
-            output = utils.position_to_onehot(x, y)
-            tfoutput = tf.expand_dims(output, axis=0)
+            output = utils.pos_to_onehot(x, y)
+            #tfoutput = tf.expand_dims(output, axis=0)
 
-            return (tfpixels, tfoutput)
+            return (pixels, output)
+            #return (tfpixels, tfoutput)
 
     def __call__(self):
         for _ in range(self._n):
@@ -55,21 +56,18 @@ class TheDataset:
 
     def shape(self):
         return (
-            tf.TensorSpec(shape=(1, 512, 512, 3), dtype=tf.uint8), # frame
+            tf.TensorSpec(shape=(512, 512, 3), dtype=tf.uint8), # frame
             #tf.TensorSpec(shape=(2), dtype=tf.uint16) # (x,y) labels
-            tf.TensorSpec(shape=(1, 64,), dtype=tf.uint8) # cell label
+            tf.TensorSpec(shape=(64,), dtype=tf.uint8) # 8x8 onehot
         )
 
 gen = TheDataset(5)
 os.makedirs('data/img', exist_ok=True)
 for eg in gen():
 
-    # unpack the tensor to make below readable. the batch_size dimension makes
-    # this pretty awkward.
-    pixels = tf.reshape(eg[0], (512, 512, 3)).numpy()
-    cell = utils.onehot_to_int(tf.reshape(eg[1], (64,)).numpy())
-    #x = eg[1][0]
-    #y = eg[1][1]
+    # unpack the tensor to make below readable.
+    pixels = eg[0]
+    x, y = utils.onehot_to_pos(eg[1])
 
     # don't train with the crosshair! it's just to check the x,y labels.
     #pixels = utils.add_crosshair(pixels, x, y)
@@ -77,8 +75,7 @@ for eg in gen():
     img = Image.fromarray(pixels)
 
     # write to disk.
-    #img.save(f"data/img/x{x}_y{y}.png")
-    img.save(f"data/img/cell_{cell}.png")
+    img.save(f"data/img/x{x}y{y}.png")
 
 
 gen = TheDataset(1000)

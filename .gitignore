@@ -8,3 +8,6 @@
 
 # ignore tensorboard logs
 /logs/*
+
+# ignore output models
+/*.keras
