@@ -1,6 +1,18 @@
 #!/usr/bin/env python
 
 import numpy as np
+from typing import List
+
+def onehot_to_int(arr: List[int]):
+    for i, cell in enumerate(arr):
+        if cell == 1:
+            return i
+    raise ValueError("invalid array")
+
+def position_to_onehot(x: int, y: int):
+    arr = np.zeros(64)
+    arr[(int(y/64)*8) + int(x/64)] = 1
+    return arr
 
 def pixel_position(model, data, cam_id, target_id, width, height):
 
