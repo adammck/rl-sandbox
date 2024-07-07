@@ -1,2 +1,7 @@
+# temporary python build stuff.
 /*.egg-info
 /build
+
+# don't check in generated training data.
+/data/img/*
+/data/tfds/*

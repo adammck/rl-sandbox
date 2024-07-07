@@ -1,10 +1,17 @@
+[tool.setuptools]
+packages = ["sandbox"]
+
 [project]
 name = "sandbox"
 version = "0.1"
 
 dependencies = [
   "mujoco>=3.1.6",
-  "numpy>=2.0.0",
   "Jinja2>=3.1.4",
   "Pillow>=10.4.0",
+  "tensorflow>=2.16.2",
+
+  # pinning old numpy because tensorflow needs it.
+  # https://github.com/tensorflow/tensorflow/issues/67291
+  "numpy<1.27.0,>=1.14.3",
 ]

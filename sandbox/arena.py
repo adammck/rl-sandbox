@@ -31,7 +31,7 @@ class Arena:
     def data(self) -> mujoco.MjData:
         return self._data
 
-    def render(self, cam_name=None) -> np.array:
+    def render(self, cam_name=None) -> np.ndarray:
 
         if cam_name is None:
             cam_name = self.camera().name
