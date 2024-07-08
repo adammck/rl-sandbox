@@ -30,7 +30,7 @@ def generate_files(n: int, path="data/img"):
         img = Image.fromarray(pixels)
 
         # write to disk.
-        img.save(f"data/img/x{x}y{y}.png")
+        img.save(f"{path}/x{x}y{y}.png")
 
 class Generator:
     def __init__(self, n):
