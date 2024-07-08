@@ -2,7 +2,7 @@
 
 import datetime
 import tensorflow as tf
-from sandbox import models
+from sandbox.models import vision
 
 ds = tf.data.Dataset.load("data/tfds")
 
@@ -16,7 +16,7 @@ batch_size = 4
 ds_training = ds_training.cache().shuffle(buffer_size=100).batch(batch_size).prefetch(buffer_size=tf.data.AUTOTUNE)
 ds_validate = ds_validate.cache().batch(batch_size).prefetch(buffer_size=tf.data.AUTOTUNE)
 
-model = models.vision()
+model = vision.get_model()
 
 model.compile(
     optimizer="adam",
