@@ -1,13 +1,27 @@
 #!/usr/bin/env python
 
-import numpy as np
 from typing import List, Tuple
+from PIL import ImageDraw
+import numpy as np
 
+# TODO: Make this more parametric.
+PIXELS_X = 512
+PIXELS_Y = 512
+CELLS_X = 8
+CELLS_Y = 8
+
+def pos_to_pixels(x: int, y: int) -> Tuple[int, int]:
+    return x * (PIXELS_X/CELLS_X), y * (PIXELS_Y/CELLS_Y)
+
+def index_to_pos(idx: int) -> Tuple[int, int]:
+    y = (idx // 8)
+    x = (idx % 8)
+    return x, y
+
+# TODO: update this to onehot_to_index and have callers call index_to_pos.
 def onehot_to_pos(arr: List[int]) -> Tuple[int, int]:
     index = np.argmax(arr)
-    y = (index // 8)
-    x = (index % 8)
-    return x, y
+    return index_to_pos(index)
 
 def pos_to_onehot(x: int, y: int):
     arr = np.zeros(64)
@@ -66,4 +80,12 @@ def add_crosshair(img, x, y, s=2, color=(255, 255, 255)):
     img[y, x1:x2] = color  # horizontal line
     img[y1:y2, x] = color  # vertical line
 
+    return img
+
+def add_box_at_pos(img, x: int, y: int):
+    px1, py1 = pos_to_pixels(x, y) # top left
+    px2, py2 = pos_to_pixels(x+1, y+1) # bottom right, plus one
+
+    draw = ImageDraw.Draw(img)
+    draw.rectangle([(px1, py1), (px2-1, py2-1)], outline="white", width=2)
     return img
