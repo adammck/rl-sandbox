@@ -1,0 +1,64 @@
+#!/usr/bin/env python
+
+import os
+import argparse
+from sandbox.generators import random as gen
+from sandbox.infer import demo as infer
+from sandbox.models import vision as vision
+
+# shut up about my cpu, tensorflow
+# https://github.com/tensorflow/tensorflow/issues/61688#issuecomment-1700451209
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+
+def main():
+    # Create the main parser
+    parser = argparse.ArgumentParser()
+
+    subparsers = parser.add_subparsers(dest="cmd", help="available commands")
+
+    parser_gen = subparsers.add_parser("gen", help="")
+    parser_gen.add_argument("--files", type=int, default=0, help="number of files to generate")
+    parser_gen.add_argument("--tfds", type=int, default=0, help="number of elements in tfds")
+    parser_gen.add_argument("--files-path", type=str, default="data/img", help="path to files")
+    parser_gen.add_argument("--tfds-path", type=str, default="data/tfds", help="path to tfds")
+
+    parser_train = subparsers.add_parser("train", help="")
+    parser_train.add_argument("--tfds-path", type=str, default="data/tfds", help="path to tfds")
+    #parser_train.add_argument("--in", type=str, default="", help="path to existing model")
+    parser_train.add_argument("--out", type=str, default="vision.keras", help="path to write model")
+    parser_train.add_argument("--epochs", type=int, default=10, help="number of epochs")
+
+    parser_infer = subparsers.add_parser("infer", help="")
+    parser_infer.add_argument("model", type=str, default="vision.keras", help="path to model")
+    parser_infer.add_argument("images", type=str, nargs="+", help="path to image(s)")
+
+    args = parser.parse_args()
+
+    if args.cmd == "gen":
+        if args.files > 0:
+            print(f"generating {args.files} files in {args.files_path}...")
+            gen.generate_files(args.files, args.files_path)
+        
+        if args.tfds > 0:
+            print(f"generating tensorflow dataset with {args.tfds} elements in {args.tfds_path}...")
+            gen.generate_dataset(args.tfds, args.tfds_path)
+        
+        if args.files == 0 and args.tfds == 0:
+            parser_gen.print_help()
+
+    elif args.cmd == "train":
+        print(f"training {args.out} on {args.tfds_path}...")
+        vision.train_model(args.tfds_path, args.out, args.epochs)
+
+    elif args.cmd == "infer":
+        if len(args.images) > 0:
+            for image_fn in args.images:
+                infer.infer_and_show(args.model, image_fn)
+        else:
+            parser_train.print_help()
+
+    else:
+        parser.print_help()
+
+if __name__ == "__main__":
+    main()

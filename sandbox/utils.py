@@ -89,3 +89,6 @@ def add_box_at_pos(img, x: int, y: int):
     draw = ImageDraw.Draw(img)
     draw.rectangle([(px1, py1), (px2-1, py2-1)], outline="white", width=2)
     return img
+
+def infer_path():
+    pass
