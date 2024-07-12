@@ -11,6 +11,9 @@ from jinja2 import Environment, PackageLoader, select_autoescape
 
 
 class Arena:
+    GOAL_DISTANCE = 1.5
+    GOAL_ANGLE = 10 # deg
+
     def __init__(self, num_obstacles=5):
         self._num_obstacles = num_obstacles
 
@@ -22,6 +25,12 @@ class Arena:
 
         self._model = mujoco.MjModel.from_xml_string(xml)
         self._data = mujoco.MjData(self._model)
+
+    def is_done(self) -> bool:
+        """Returns true if the goal has been reached."""
+
+        dist, deg = self._get_target_dist_deg()
+        return dist < self.GOAL_DISTANCE and (-self.GOAL_ANGLE < deg < self.GOAL_ANGLE)
 
     @property
     def model(self) -> mujoco.MjModel:
@@ -76,6 +85,33 @@ class Arena:
                 for n in range(self._num_obstacles)
             ]
         }
+
+    def _get_target_dist_deg(self) -> Tuple[float, float]:
+        cam_id = self.camera().id
+
+        # calculate distance between robot and target.
+        pr = self._data.xpos[cam_id]
+        pt = self._data.xpos[self.target().id]
+        dist = mujoco.mju_dist3(pr, pt)
+
+        # get the direction vector in the global frame
+        dir_vec = pt - pr
+        dir_vec_nom = dir_vec / np.linalg.norm(dir_vec)
+
+        # get the rotation matrix of the camera
+        rot = self._data.xmat[cam_id].reshape((3, 3))
+
+        # transform the direction vector to the camera's local frame
+        dir_vec_local = np.dot(rot.T, dir_vec_nom)
+
+        # calculate the angle in the camera's local frame
+        angle = np.arctan2(dir_vec_local[1], dir_vec_local[0]) # angle relative to the camera's forward direction
+        deg = np.degrees(angle)
+
+        # HACK: why is the output wrong by 90 deg :|
+        deg = 90-deg
+
+        return dist, deg
 
 # TODO: these are all rather duplicative. use a superclass or something.
 

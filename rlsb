@@ -5,6 +5,7 @@ import argparse
 from sandbox.generators import random as gen
 from sandbox.infer import demo as infer
 from sandbox.models import vision as vision
+from sandbox.capture import capture
 
 # shut up about my cpu, tensorflow
 # https://github.com/tensorflow/tensorflow/issues/61688#issuecomment-1700451209
@@ -29,8 +30,12 @@ def main():
     parser_train.add_argument("--epochs", type=int, default=10, help="number of epochs")
 
     parser_infer = subparsers.add_parser("infer", help="")
-    parser_infer.add_argument("model", type=str, default="vision.keras", help="path to model")
+    parser_infer.add_argument("model", type=str, default="vision.keras", help="path to vision model")
     parser_infer.add_argument("images", type=str, nargs="+", help="path to image(s)")
+
+    parser_capture = subparsers.add_parser("capture", help="")
+    parser_capture.add_argument("model", type=str, default="vision.keras", help="path to vision model")
+    parser_capture.add_argument("--path", type=str, default="data/capture", help="path write training data")
 
     args = parser.parse_args()
 
@@ -56,6 +61,9 @@ def main():
                 infer.infer_and_show(args.model, image_fn)
         else:
             parser_train.print_help()
+
+    elif args.cmd == "capture":
+        capture.launch(vision.load_model(args.model))
 
     else:
         parser.print_help()

@@ -23,7 +23,7 @@ while True:
     aren = arena.Arena()
     m = aren.model
     d = aren.data
-    ctrl = controllers.Cheater(aren.camera().id, aren.target().id)
+    ctrl = controllers.Cheater(aren)
 
     with mujoco.viewer.launch_passive(m, d, key_callback=keypress) as viewer:
 
@@ -38,7 +38,7 @@ while True:
             mujoco.mj_step(m, d)
 
             # if done, then stop.
-            if reset or exit or ctrl.done(d):
+            if reset or exit or aren.is_done():
                 reset = False
                 break
 

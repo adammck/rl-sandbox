@@ -32,6 +32,9 @@ def get_model():
         tf.keras.layers.Dense(64, activation="softmax")
     ])
 
+def load_model(model_fn: str):
+    return tf.keras.models.load_model(model_fn)
+
 def train_model(dataset_fn:str, model_fn:str, epochs=10, batch_size:int=4):
     ds = tf.data.Dataset.load(dataset_fn)
 

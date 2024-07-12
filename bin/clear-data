@@ -1,3 +1,4 @@
 #!/bin/sh
 
 git clean -f -x -- data
+git clean -f -x -d -- logs
