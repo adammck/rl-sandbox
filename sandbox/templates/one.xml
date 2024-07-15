@@ -108,6 +108,7 @@
     <light pos="-4 4 12" dir="0 0 -1" attenuation="0.25 0 0" />
     <light pos="4 -4 9" dir="0 0 -1" attenuation="0.25 0 0" />
 
+    {% if target %}
     <!-- target -->
     <!-- TODO: replace condim=1 with friction -->
     <body name="target_red" pos="{{ target.pos }}">
@@ -115,6 +116,7 @@
       <light pos="0 0 2" dir="0 0 -1" />
       <geom type="box" size="0.2 0.2 0.2" pos="0 0 0.2" rgba="1 0.2 0.2 1" condim="1" />
     </body>
+    {% endif %}
 
     <!-- obstacles -->
     {% for obs in obstacles %}

@@ -11,10 +11,11 @@ from jinja2 import Environment, PackageLoader, select_autoescape
 
 
 class Arena:
-    GOAL_DISTANCE = 1.5
+    GOAL_DISTANCE = 1
     GOAL_ANGLE = 10 # deg
 
-    def __init__(self, num_obstacles=5):
+    def __init__(self, num_targets=1, num_obstacles=5):
+        self._num_targets = num_targets
         self._num_obstacles = num_obstacles
 
         env = Environment(
@@ -77,9 +78,18 @@ class Arena:
        return self._model.body("target_red")
 
     def _vars(self):
+        if self._num_targets == 0:
+            t = None
+
+        elif self._num_targets == 1:
+            t = Target(self)
+
+        else:
+            raise ValueError("only zero or one targets is currently supported")
+
         return {
             "robot": Robot(self),
-            "target": Target(self),
+            "target": t,
             "obstacles": [
                 Obstacle(self, str(n))
                 for n in range(self._num_obstacles)

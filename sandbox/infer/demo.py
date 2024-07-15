@@ -19,9 +19,14 @@ def infer_and_show(model_fn: str, image_fn: str):
     # output of the model the probabilities of each of the 64 cells. convert
     # it back into a cell index, and then the x, y pos (in cells, not px).
     probs = model.predict(np.expand_dims(pixels, axis=0))
-    x, y = utils.index_to_pos(np.argmax(probs))
 
-    print(f"{image_fn}: x={x}, y={y}")
+    found, x, y = utils.probs_to_pos(probs)
+    #x, y = utils.index_to_pos(np.argmax(probs))
+    if not found:
+        print(f"{image_fn}: not found")
 
-    utils.add_box_at_pos(image, x, y)
+    else:
+        print(f"{image_fn}: x={x}, y={y}")
+        utils.add_box_at_pos(image, x, y)
+
     image.show()

@@ -10,6 +10,21 @@ PIXELS_Y = 512
 CELLS_X = 8
 CELLS_Y = 8
 
+
+def probs_to_pos(probs: List[int], threshold=2) -> Tuple[bool, int, int]:
+    print(f"probs={probs}")
+    m = np.max(probs)
+
+    if m < (1/64)*threshold:
+        # no prob above threshold; probably no match.
+        return (False, 0, 0)
+
+    else:
+        # at least one good guess, so take it.
+        i = np.argmax(probs)
+        x, y = index_to_pos()
+        return (True, x, y)
+
 def pos_to_pixels(x: int, y: int) -> Tuple[int, int]:
     return x * (PIXELS_X/CELLS_X), y * (PIXELS_Y/CELLS_Y)
 
@@ -17,6 +32,7 @@ def index_to_pos(idx: int) -> Tuple[int, int]:
     y = (idx // 8)
     x = (idx % 8)
     return x, y
+
 
 # TODO: update this to onehot_to_index and have callers call index_to_pos.
 def onehot_to_pos(arr: List[int]) -> Tuple[int, int]:
@@ -27,6 +43,12 @@ def pos_to_onehot(x: int, y: int):
     arr = np.zeros(64)
     arr[(int(y/64)*8) + int(x/64)] = 1
     return arr
+
+def zero_onehot():
+    return np.zeros(CELLS_X * CELLS_Y)
+
+def onehot_is_zero(arr: List[int]) -> bool:
+    return np.sum(arr) == 0
 
 def pixel_position(model, data, cam_id, target_id, width, height):
 
