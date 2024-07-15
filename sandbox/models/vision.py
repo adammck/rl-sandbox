@@ -5,7 +5,7 @@ import tensorflow as tf
 
 def get_model():
     return tf.keras.Sequential([
-        tf.keras.layers.InputLayer(shape=(512, 512, 3)),
+        tf.keras.layers.InputLayer(input_shape=(512, 512, 3)),
 
         # scale 0-255 pixel values to 0-1
         tf.keras.layers.Rescaling(1./255),
