@@ -22,7 +22,7 @@ def probs_to_pos(probs: List[int], threshold=2) -> Tuple[bool, int, int]:
     else:
         # at least one good guess, so take it.
         i = np.argmax(probs)
-        x, y = index_to_pos()
+        x, y = index_to_pos(i)
         return (True, x, y)
 
 def pos_to_pixels(x: int, y: int) -> Tuple[int, int]:
