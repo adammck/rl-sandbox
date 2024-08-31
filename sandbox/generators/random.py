@@ -8,13 +8,13 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
 import tensorflow as tf
 from PIL import Image
 
-def generate_dataset(n: int, path:str="", ratio=0.2):
+def generate_dataset(n: int, path:str="", ratio=0.9):
     os.makedirs(path, exist_ok=True)
     gen = Generator(n, ratio)
     ds = tf.data.Dataset.from_generator(gen, output_signature=gen.shape())
     tf.data.Dataset.save(ds, path)
 
-def generate_files(n: int, path="data/img", ratio=0.2):
+def generate_files(n: int, path="data/img", ratio=0.9):
     os.makedirs(path, exist_ok=True)
     gen = Generator(n, ratio)
     for eg in gen():
@@ -39,8 +39,8 @@ def generate_files(n: int, path="data/img", ratio=0.2):
 
 class Generator:
     def __init__(self, n, ratio):
-        self._n = int(n*0.9)
-        self._m = n - self._n
+        self._n = int(n * ratio) # one target
+        self._m = n - self._n    # no target
 
     def _generate(self, num_targets=1):
 
