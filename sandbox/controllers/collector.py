@@ -18,6 +18,7 @@ class Collector:
     def __init__(self):
         self._action = 0
         self._blocking = False
+        self._last_action = (None, None) # d, action
 
     def key_callback(self, code: int):
         pass
@@ -35,6 +36,15 @@ class Collector:
             i = np.argmax(probs)
             d[i] = 1
         print(f"d:{d}")
+
+        # if the input to the collector is the same as the previous action, then
+        # don't bother asking -- we assume that the operator will provide the
+        # same answer.
+        if self._last_action[0] is not None:
+            if self._last_action[0] == d:
+                action = self._last_action[1]
+                print(f"repeating last action:{action}")
+                return action
 
         fn = "../collector/examples.jsonl"
         last_size = os.path.getsize(fn)
@@ -77,6 +87,10 @@ class Collector:
 
         action = np.argmax(output)
         print(f"action:{action}")
+
+        # cache the result for next time
+        self._last_action = (d, action)
+
         return action
 
     def _wait_for_line():
