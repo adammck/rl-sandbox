@@ -27,7 +27,7 @@ class Keyboard:
         elif code == 32: # space
             self._action = 0
 
-    def next_action(self):
+    def next_action(self, probs):
         # wait for a keypress before acting.
         # TODO: do i need a lock here? i have no idea how to python
         if self._blocking:

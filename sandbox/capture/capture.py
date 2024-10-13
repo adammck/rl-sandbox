@@ -11,13 +11,14 @@ from sandbox import utils
 # signals
 
 class Capturer:
-    SECONDS_PER_ACTION = 0.25
+    SECONDS_PER_ACTION = 0.5
 
     def __init__(self, vision_model):
         self.vision_model = vision_model
-        self.arena = arena.Arena()
+        self.arena = arena.Arena(num_targets=1, num_obstacles=0)
         self.renderer = mujoco.Renderer(self.arena.model, 512, 512)
-        self.ctrl = controllers.Keyboard()
+        self.ctrl = controllers.Collector()
+        #self.ctrl = controllers.Keyboard()
         #self.ctrl = controllers.Cheater(self.arena)
         self.want_exit = None
         self._next_action = None
@@ -36,7 +37,6 @@ class Capturer:
         Returns true if the viewer should exit.
         """
 
-        start = time.time()
         mujoco.mj_step(self.arena.model, self.arena.data)
 
         # apply changes to the viewer.
@@ -51,13 +51,13 @@ class Capturer:
             return True
 
         # if enough time has passed, compute and apply the next action.
-        if self._next_action is None or self._next_action <= start:
-            self._next_action = start + self.SECONDS_PER_ACTION
+        if self._next_action is None or self._next_action <= time.time():
             self.action_step(viewer)
+            self._next_action = time.time() + self.SECONDS_PER_ACTION
 
         # wait until its time to advance to the next sim step.
         # this is pasted from the examples and is NOT accurate.
-        time_until_next_step = self.arena.model.opt.timestep - (time.time() - start)
+        time_until_next_step = self.arena.model.opt.timestep
         if time_until_next_step > 0:
             time.sleep(time_until_next_step)
         
@@ -76,7 +76,7 @@ class Capturer:
 
         # compute the next action.
         # (this may block indefinitely!)
-        action = self.ctrl.next_action()
+        action = self.ctrl.next_action(probs)
 
         # log. this is the training data for the control model.
         print(f"x={x}, y={y} -> act={action}")

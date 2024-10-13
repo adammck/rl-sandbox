@@ -13,15 +13,15 @@ def get_model():
         # idk lol
         tf.keras.layers.Conv2D(32, 3, activation="relu"),
         tf.keras.layers.MaxPooling2D(),
-        tf.keras.layers.Dropout(0.25),
+        tf.keras.layers.Dropout(0.1),
 
         tf.keras.layers.Conv2D(32, 3, activation="relu"),
         tf.keras.layers.MaxPooling2D(),
-        tf.keras.layers.Dropout(0.25),
+        tf.keras.layers.Dropout(0.1),
 
         tf.keras.layers.Conv2D(32, 3, activation="relu"),
         tf.keras.layers.MaxPooling2D(),
-        tf.keras.layers.Dropout(0.25),
+        #tf.keras.layers.Dropout(0.1),
 
         # magic goes here
         tf.keras.layers.Flatten(),
@@ -48,8 +48,10 @@ def train_model(dataset_fn:str, model_fn:str, epochs=10, batch_size:int=4):
 
     model = get_model()
 
+    optimizer = tf.keras.optimizers.Adam(learning_rate=0.0001, clipnorm=1.0)
+
     model.compile(
-        optimizer="adam",
+        optimizer=optimizer,
         loss=tf.keras.losses.CategoricalCrossentropy(),
         metrics=["accuracy"])
 
