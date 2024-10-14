@@ -30,7 +30,7 @@ $ pip install -e .
 02. Train the vision model:
 
     ```console
-    $ ./rlsb train --epochs=10
+    $ ./rlsb train-vision --epochs=10
     training vision.keras on data/tfds...
     Epoch 1/10
     200/200 ━━━━━━━━━━━━━━━━━━━━ 177s 868ms/step - accuracy: 0.0497 - loss: 3.9188 - val_accuracy: 0.1700 - val_loss: 3.1028
