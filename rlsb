@@ -2,9 +2,10 @@
 
 import os
 import argparse
+from sandbox import controllers
 from sandbox.generators import random as gen
 from sandbox.infer import demo as infer
-from sandbox.models import vision
+from sandbox.models import vision, control
 from sandbox.converter import converter
 from sandbox.capture import capture
 
@@ -43,6 +44,11 @@ def main():
     parser_train.add_argument("--input", type=str, default="data/capture/examples.jsonl", help="path to read input")
     parser_train.add_argument("--output", type=str, default="data/control", help="path to write output")
 
+    parser_train = subparsers.add_parser("train-control", help="")
+    parser_train.add_argument("--data", type=str, default="data/control", help="path to training data")
+    parser_train.add_argument("--out", type=str, default="control.keras", help="path to write model")
+    parser_train.add_argument("--epochs", type=int, default=10, help="number of epochs")
+
     args = parser.parse_args()
 
     if args.cmd == "gen":
@@ -69,11 +75,16 @@ def main():
             parser_train.print_help()
 
     elif args.cmd == "capture":
-        capture.launch(vision.load_model(args.model))
+        ctrl = controllers.Collector()
+        capture.launch(vision.load_model(args.model), ctrl)
 
     elif args.cmd == "convert":
         converter.convert(args.input, args.output)
         print("OK")
+
+    elif args.cmd == "train-control":
+        print(f"training control model {args.out} on {args.data}...")
+        control.train_model(args.data, args.out, args.epochs)
 
     else:
         parser.print_help()

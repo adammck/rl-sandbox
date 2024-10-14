@@ -13,11 +13,11 @@ from sandbox import utils
 class Capturer:
     SECONDS_PER_ACTION = 0.5
 
-    def __init__(self, vision_model):
+    def __init__(self, vision_model, controller):
         self.vision_model = vision_model
         self.arena = arena.Arena(num_targets=1, num_obstacles=0)
         self.renderer = mujoco.Renderer(self.arena.model, 512, 512)
-        self.ctrl = controllers.Collector()
+        self.ctrl = controller
         #self.ctrl = controllers.Keyboard()
         #self.ctrl = controllers.Cheater(self.arena)
         self.want_exit = None
@@ -103,5 +103,5 @@ class Capturer:
                 if should_exit:
                     break
 
-def launch(vision_model):
-    return Capturer(vision_model).launch()
+def launch(vision_model, ctrl):
+    return Capturer(vision_model, ctrl).launch()
