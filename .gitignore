@@ -3,6 +3,7 @@
 /build
 
 # don't check in generated training data.
+/data/control/*
 /data/img/*
 /data/tfds/*
 

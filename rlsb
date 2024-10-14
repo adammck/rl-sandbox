@@ -4,7 +4,8 @@ import os
 import argparse
 from sandbox.generators import random as gen
 from sandbox.infer import demo as infer
-from sandbox.models import vision as vision
+from sandbox.models import vision
+from sandbox.converter import converter
 from sandbox.capture import capture
 
 # shut up about my cpu, tensorflow
@@ -37,6 +38,11 @@ def main():
     parser_capture.add_argument("model", type=str, default="vision.keras", help="path to vision model")
     parser_capture.add_argument("--path", type=str, default="data/capture", help="path write training data")
 
+    # temporary conversion between the jsonl output of collector and this thing which uses tfds
+    parser_train = subparsers.add_parser("convert", help="")
+    parser_train.add_argument("--input", type=str, default="data/capture/examples.jsonl", help="path to read input")
+    parser_train.add_argument("--output", type=str, default="data/control", help="path to write output")
+
     args = parser.parse_args()
 
     if args.cmd == "gen":
@@ -64,6 +70,10 @@ def main():
 
     elif args.cmd == "capture":
         capture.launch(vision.load_model(args.model))
+
+    elif args.cmd == "convert":
+        converter.convert(args.input, args.output)
+        print("OK")
 
     else:
         parser.print_help()
