@@ -81,7 +81,7 @@ def main():
 
     elif args.cmd == "capture":
         ctrl = controllers.Collector()
-        capture.launch(vision.load_model(args.model), ctrl)
+        capture.launch(vision.load_model(args.model), ctrl, "pov")
 
     elif args.cmd == "convert":
         converter.convert(args.input, args.output)
