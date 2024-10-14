@@ -71,8 +71,8 @@ class Arena:
     def robot(self):
        return self._model.body("robot")
     
-    def camera(self):
-       return self._model.camera("pov")
+    def camera(self, name: str="pov"):
+       return self._model.camera(name)
 
     def target(self):
        return self._model.body("target_red")

@@ -13,11 +13,12 @@ from sandbox import utils
 class Capturer:
     SECONDS_PER_ACTION = 0.5
 
-    def __init__(self, vision_model, controller):
+    def __init__(self, vision_model, controller, cam):
         self.vision_model = vision_model
         self.arena = arena.Arena(num_targets=1, num_obstacles=0)
         self.renderer = mujoco.Renderer(self.arena.model, 512, 512)
         self.ctrl = controller
+        self._cam = cam
         #self.ctrl = controllers.Keyboard()
         #self.ctrl = controllers.Cheater(self.arena)
         self.want_exit = None
@@ -65,8 +66,9 @@ class Capturer:
 
     def action_step(self, viewer):
         
-        # fetch the current view as pixels.
-        self.renderer.update_scene(self.arena.data, self.arena.camera().id)
+        # fetch the current pov as pixels. note that this might not be what is
+        # currently displayed in the render window.
+        self.renderer.update_scene(self.arena.data, self.arena.camera("pov").id)
         pixels = self.renderer.render()
         #Image.fromarray(pixels, 'RGB').show()
 
@@ -96,12 +98,12 @@ class Capturer:
             # the robot sees.
             with viewer.lock():
                 viewer.cam.type = mujoco.mjtCamera.mjCAMERA_FIXED
-                viewer.cam.fixedcamid = self.arena.camera().id
+                viewer.cam.fixedcamid = self.arena.camera(self._cam).id
 
             while viewer.is_running():
                 should_exit = self.sim_step(viewer)
                 if should_exit:
                     break
 
-def launch(vision_model, ctrl):
-    return Capturer(vision_model, ctrl).launch()
+def launch(vision_model, ctrl, cam):
+    return Capturer(vision_model, ctrl, cam).launch()
