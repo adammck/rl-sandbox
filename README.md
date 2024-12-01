@@ -15,6 +15,14 @@ $ pyenv install
 $ pip install -e .
 ```
 
+To generate the protobuf client:
+
+```console
+$ pip install ".[dev]"
+$ bin/fetch-proto.sh
+$ bin/gen-proto.sh
+```
+
 ## Usage
 
 01. Generate some training data for the vision model:

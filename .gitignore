@@ -2,6 +2,12 @@
 /*.egg-info
 /build
 
+# don't check in protos; we fetch them from the collector repo for now.
+/proto/*.proto
+
+# also don't check in generated clients for now.
+/proto/gen/*.py
+
 # don't check in generated training data.
 /data/control/*
 /data/img/*
