@@ -8,8 +8,6 @@ import numpy as np
 from sandbox import arena, controllers
 from sandbox import utils
 
-# signals
-
 class Capturer:
     SECONDS_PER_ACTION = 0.5
 
@@ -23,7 +21,7 @@ class Capturer:
         #self.ctrl = controllers.Cheater(self.arena)
         self.want_exit = None
         self._next_action = None
-    
+
     def key_callback(self, code: int):
         #print(f"key_press: {code}")
 

@@ -33,6 +33,13 @@ def index_to_pos(idx: int) -> Tuple[int, int]:
     x = (idx % 8)
     return x, y
 
+def index_to_onehot(size: int, idx: int) -> List[int]:
+    if not 0 <= idx < size:
+        raise ValueError(f"index {idx} out of range for size {size}")
+
+    result = [0] * size
+    result[idx] = 1
+    return result
 
 # TODO: update this to onehot_to_index and have callers call index_to_pos.
 def onehot_to_pos(arr: List[int]) -> Tuple[int, int]:

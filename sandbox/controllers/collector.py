@@ -5,6 +5,10 @@ import os
 import time
 from typing import List
 import numpy as np
+import grpc
+from proto.gen import collector_pb2
+from proto.gen import collector_pb2_grpc
+from sandbox import utils
 
 class Collector:
     ACTIONS = [
@@ -19,6 +23,9 @@ class Collector:
         self._action = 0
         self._blocking = False
         self._last_action = (None, None) # d, action
+        self._output = "data/capture/examples.jsonl" # todo: use param
+        self._chan = self.channel = grpc.insecure_channel("localhost:50051") # todo: use param
+        self._stub = collector_pb2_grpc.CollectorStub(self._chan)
 
     def key_callback(self, code: int):
         pass
@@ -46,47 +53,40 @@ class Collector:
                 print(f"repeating last action:{action}")
                 return action
 
-        fn = "../collector/examples.jsonl"
-        last_size = os.path.getsize(fn)
 
-        # write the vision data to file so the collector can find it.
-        # TODO: inject the path via command line arg
-        with open("../collector/input/tmp.jsonl", "w") as f:
-            json.dump(d, f)
+        print("collecting...")
 
-        new_data = {}
+        # send the vision data to collector, and wait for a human to decide
+        # which action to take.
+        res = self._stub.Collect(collector_pb2.Request(
+            inputs=[
+                collector_pb2.Input(
+                    grid=collector_pb2.Grid(rows=8, cols=8),
+                    data=collector_pb2.Data(ints=collector_pb2.Ints(values=d))
+                )
+            ],
+            # todo: derive from self.ACTIONS
+            output=collector_pb2.OutputSchema(option_list=collector_pb2.OptionListSchema(options=[
+                collector_pb2.Option(label="stop", hotkey=" "),              # stop
+                collector_pb2.Option(label="forwards", hotkey="ArrowUp"),    # forwards
+                collector_pb2.Option(label="backwards", hotkey="ArrowDown"), # backwards
+                collector_pb2.Option(label="left", hotkey="ArrowLeft"),      # left
+                collector_pb2.Option(label="right", hotkey="ArrowRight"),    # right
+            ]))
+        ))
 
-        print("waiting...")
+        if not res.output.HasField('option_list'):
+            raise RuntimeError("response had no option_list!")
 
-        # wait for a line to be added to the output file, indicating the the
-        # has received the vision data, and submitted a response.
-        while True:
-            s = os.path.getsize(fn)
-            if s == last_size:
-                time.sleep(0.1)
-                continue
-
-            with open(fn, "r") as f:
-                f.seek(last_size)
-                line = f.readline()
-
-            new_data = json.loads(line.strip())
-            last_size = s
-            break
-
-        print(f"got data! {new_data}")
-
-        # check that the input included in the new line matches the input that
-        # we submitted. otherwise we're racing and/or confused.
-        if new_data["input"] != d:
-            raise RuntimeError("output line from collector didn't match input")
-
-        output = new_data["output"]
-        if len(output) != len(self.ACTIONS):
-            raise RuntimeError("output length did not match actions length")
-
-        action = np.argmax(output)
+        action = res.output.option_list.index
         print(f"action:{action}")
+
+        # append the input and action to the training data. we convert it to a
+        # tensorflow dataset later.
+        with open(self._output, "a") as f:
+            line = {"input": d, "output": utils.index_to_onehot(len(self.ACTIONS), action)}
+            json.dump(line, fp=f)
+            f.write("\n")
 
         # cache the result for next time
         self._last_action = (d, action)
