@@ -11,7 +11,7 @@ from jinja2 import Environment, PackageLoader, select_autoescape
 
 
 class Arena:
-    GOAL_DISTANCE = 1
+    GOAL_DISTANCE = 1.5
     GOAL_ANGLE = 10 # deg
 
     def __init__(self, num_targets=1, num_obstacles=5):
